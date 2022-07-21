@@ -175,15 +175,21 @@
 </ol>
 
 </details>
-<textarea id="content" value="" placeholder="つぶやく内容" cols="40" rows="5"></textarea>
+<textarea id="content" value="" placeholder="つぶやく内容またはDBファイルをドラッグ＆ドロップ" cols="40" rows="5"></textarea>
 <button id="post" type="button">つぶやく</button>
 <button id="download" type="button">ダウンロード</button>
+<input type="file" id="file-input" value="アップロード">
+<input type="checkbox" id="is-over-write" disabled><label for="is-over-write">上書き許可</label>
+<button id="delete" type="button">削除</button>
 <!--<button id="selected-delete" type="button">選択削除</button>-->
+<!--
 <button id="delete" type="button">削除</button>
 <div id="drop-zone" style="border:1px solid; padding:32px;">
 <p>ファイルをドラッグ＆ドロップ</p>
 または<input type="file" id="file-input">
+-->
 <!--<label><input type="checkbox" id="is-over-write" disabled>上書き許可</label>-->
+<!--<input type="checkbox" id="is-over-write" disabled><label for="is-over-write">上書き許可</label>-->
 </div>
 <div id="post-list"></div>
 

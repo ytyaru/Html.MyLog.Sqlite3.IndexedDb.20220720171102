@@ -7,7 +7,8 @@ class MyLogUploader {
     }
     async setup() {
         const self = this
-        const dropZone = document.getElementById('drop-zone');
+        //const dropZone = document.getElementById('drop-zone');
+        const dropZone = document.getElementById('content');
         const fileInput = document.getElementById('file-input');
         const preview = document.getElementById('preview');
         dropZone.addEventListener('dragover', (e)=>{
@@ -25,17 +26,20 @@ class MyLogUploader {
         fileInput.addEventListener('change', async(e)=>{
             if (0 === e.target.files.length) { return }
             Loading.show()
+            console.debug(e.target)
+            console.debug(e.target.files)
+            await this.#setupFileReader(e.target.files[0], dropZone)
+            /*
             const fr = new FileReader();
             console.debug(e)
             console.debug(e.target.files)
-            //this.file = e.target.files[0]
-            //console.debug(this.file)
-            //console.debug(this.file.name)
             fr.readAsArrayBuffer(e.target.files[0])
             fr.addEventListener('load', async(event) => {
                 console.debug(event)
                 await this.#load(e.target.files[0].name, new Uint8Array(fr.result)) 
+                dropZone.focus()
             })
+            */
         });
         dropZone.addEventListener('drop', async(e)=>{
             Loading.show()
@@ -46,16 +50,27 @@ class MyLogUploader {
             var files = e.dataTransfer.files; //ドロップしたファイルを取得
             if (files.length > 1) { return Toaster.toast('アップロードできるファイルは1つだけです。', true); }
             fileInput.files = files; //inputのvalueをドラッグしたファイルに置き換える。
-            //this.file = files[0]
-            //console.debug(this.file)
-            //console.debug(this.file.name)
+            await this.#setupFileReader(files[0], dropZone)
+            /*
             const fr = new FileReader();
             fr.readAsArrayBuffer(files[0])
             fr.addEventListener('load', async(event) => {
                 console.debug(event)
                 await this.#load(files[0].name, new Uint8Array(fr.result)) 
+                dropZone.focus()
             })
+            */
         }, false);
+    }
+    async #setupFileReader(file, dropZone) {
+        //console.debug(file)
+        const fr = new FileReader();
+        fr.readAsArrayBuffer(file)
+        fr.addEventListener('load', async(event) => {
+            //console.debug(event)
+            await this.#load(file.name, new Uint8Array(fr.result)) 
+            dropZone.focus()
+        })
     }
     async #load(name, content) { // ローカルのsqlite3ファイルからIndexedDBへマージする
         console.debug(this.sqlFile)

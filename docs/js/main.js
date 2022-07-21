@@ -19,10 +19,13 @@ window.addEventListener('DOMContentLoaded', async(event) => {
             //sqlFile.read(name)
             //const res = sqlFile.db.exec(`select * from comments where created = (select MAX(created) from comments);`)
             sqlFile.db.exec(`insert into comments(content, created) values('${content}', ${now});`)
-            await sqlFile.write(name)
+            const res = await sqlFile.write(name)
+            if (res) { Toaster.toast(`ローカルファイルにも追記しました。: ${name}`) }
             //console.debug(sqlFile.file)
             //sqlFile.write(sqlFile.file.name)
-            Toaster.toast(`ローカルファイルにも追記しました。: ${name}`)
+
+            // 書き込み許可をしなくても実行されてしまう！
+            //Toaster.toast(`ローカルファイルにも追記しました。: ${name}`)
         //}
         }
     })
@@ -43,8 +46,8 @@ window.addEventListener('DOMContentLoaded', async(event) => {
                 sqlFile.db.exec(`delete from comments where id = ${id};`)
             }
             sqlFile.db.exec(`COMMIT;`)
-            await sqlFile.write(name)
-            Toaster.toast(`ローカルファイルからも削除しました。: ${name}`)
+            const res = await sqlFile.write(name)
+            if (res) { Toaster.toast(`ローカルファイルからも削除しました。: ${name}`) }
         }
         /*
         if (0===deletes.length) {

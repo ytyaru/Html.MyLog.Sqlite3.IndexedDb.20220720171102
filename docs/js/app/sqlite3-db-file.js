@@ -3,10 +3,11 @@ class Sqlite3DbFile { // FileSystemAccess API は Chromeでしか使えない
     constructor() {
         this.PATH_WASM = `lib/sql.js/1.7.0`
         this.db = null
+        this.isOverwrite = false
     }
     async write(name) {
         const dirHandle = await this.#getDirectoryPicker()
-        if (!dirHandle) { return }
+        if (!dirHandle) { return false }
         try {
             const fileHandle = await dirHandle.getFileHandle(name, {
                 create: true,
@@ -15,13 +16,17 @@ class Sqlite3DbFile { // FileSystemAccess API は Chromeでしか使えない
             console.debug(this.db.exec(`select * from comments;`))
             await writable.write(this.db.export())
             await writable.close()
+            this.isOverwrite = true
+            document.getElementById('is-over-write').checked = true
+            return true
         } catch (e) {
             console.error(e)
+            return false
         }
     }
     async read(name) {
         const dirHandle = await this.#getDirectoryPicker()
-        if (!dirHandle) { return }
+        if (!dirHandle) { return null }
         console.debug(dirHandle)
         const fileHandle = await dirHandle.getFileHandle(name)
         const file = await fileHandle.getFile()
