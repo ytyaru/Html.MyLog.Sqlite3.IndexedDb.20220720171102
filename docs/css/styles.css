@@ -17,8 +17,8 @@ body {
     line-height: 1.5em;
     letter-spacing: 0.05em;
 }
-time {
-    font-size: calc(100vw / calc(var(--line-of-chars) * 0.5)));
+#post-list time {
+    font-size: max(10px, calc(100vw / (var(--line-of-chars) * 2)));
 }
 #content {
     display: flex;

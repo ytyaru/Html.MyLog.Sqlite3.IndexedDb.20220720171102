@@ -3,6 +3,9 @@ class MyLogDb {
         this.version = 1
         this.name = `mylog-${this.version}.db`
         this.dexie = new Dexie(this.name)
+        //this.now = new Date().toLocaleString({ timeZone: 'Asia/Tokyo' }).replace(/\//g, '-')
+        this.now = new Date()
+        //this.now = Math.floor(new Date().getTime() / 1000)
         this.create()
     }
     create() {
@@ -46,6 +49,7 @@ class MyLogDb {
         return this.#insertHtml(id, content, now)
     }
     //#insertHtml(content, created) { return `<p>${this.#toContent(content)}<br>${this.#toTime(created)}</p>` }
+    //#insertHtml(id, content, created) { return `<p>${this.#toContent(content)}<br>${this.#toTime(created)}${this.#toDeleteCheckbox(id)}</p>` }
     #insertHtml(id, content, created) { return `<p>${this.#toContent(content)}<br>${this.#toTime(created)}${this.#toDeleteCheckbox(id)}</p>` }
     async toHtml() {
         const cms = await this.dexie.comments.toArray()
@@ -57,8 +61,26 @@ class MyLogDb {
     #toTime(created) {
         const d = new Date(created * 1000)
         const u = d.toISOString()
-        const l = d.toLocaleString({ timeZone: 'Asia/Tokyo' })
-        return `<time datetime="${u}">${l}</time>`
+        //const l = d.toLocaleString({ timeZone: 'Asia/Tokyo' }).replace(/\//g, '-')
+        const l = this.#toElapsedTime(created)
+        return `<time datetime="${u}" title="${u}">${l}</time>`
+    }
+    #toElapsedTime(created) { // 年、月、日が現在と同じなら省略する
+        // 同じ日なら時間だけ表示
+        // 同じ年なら月日だけ表示
+        // それ以降なら年月日表示
+        const d = new Date(created * 1000)
+        console.debug(this.now.getTime() - created)
+        console.debug(this.now.getYear()===d.getYear(), this.now.getMonth()===d.getMonth(), d.getDate() < this.now.getDate())
+        console.debug(this.now.getYear(), d.getYear(), this.now.getMonth(), d.getMonth(), d.getDate(), this.now.getDate())
+        //if (946080000 < (this.now - created)) { return `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}` } // 一年間以上
+        if (d.getYear() < this.now.getYear()) { return `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}` } // 一年間以上
+        //else if (86400 < (this.now - created)) { return `${(d.getMonth()+1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}` } // 一日以上
+        else if (this.now.getYear()===d.getYear() && this.now.getMonth()===d.getMonth() && d.getDate() < this.now.getDate()) {
+            return `${(d.getMonth()+1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}`
+        }
+        else { return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}` } // 同じ日
+        //else { return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}:${d.getSeconds().toString().padStart(2, '0')}` } // 同じ日
     }
     #toContent(content) {
         return content.replace(/\r\n|\n/g, '<br>')
